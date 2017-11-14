@@ -31,3 +31,4 @@ class User:
         self.time_played = json['mergedAllCharacters']['merged']['allTime']['secondsPlayed']['basic']['displayValue']
         self.highest_light = json['mergedAllCharacters']['merged']['allTime']['highestLightLevel']['basic']['displayValue']
         self.kda = json['mergedAllCharacters']['results']['allPvP']['allTime']['efficiency']['basic']['displayValue']
+        self.suicides = json['mergedAllCharacters']['merged']['allTime']['suicides']['basic']['displayValue']

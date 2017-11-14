@@ -6,7 +6,6 @@ from collections import namedtuple
 
 import keys
 import destiny
-from handler import Handler
 
 from dev_utils import json_browser
 
@@ -80,5 +79,13 @@ async def kda(message):
     resp = await client.send_message(message.channel, f'Getting {account}\'s kda...')
     user = await api.get_user_from_battlenet(account)
     await client.edit_message(resp, f'{account}\'s PvP kda is {user.kda}')
+
+@bot_command('!roast')
+async def roast(message):
+    tokens = message.content.split()
+    account = tokens[1]
+    resp = await client.send_message(message.channel, f'Generating sick burn...')
+    user = await api.get_user_from_battlenet(account)
+    await client.edit_message(resp, f'{account} has suicided {user.suicides} times')
 
 client.run(keys.BOT_TOKEN)
