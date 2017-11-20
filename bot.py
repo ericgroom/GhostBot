@@ -88,4 +88,6 @@ async def roast(message):
     user = await api.get_user_from_battlenet(account)
     await client.edit_message(resp, f'{account} has suicided {user.suicides} times')
 
-client.run(keys.BOT_TOKEN)
+
+if __name__ == "__main__":
+    client.run(keys.BOT_TOKEN)
