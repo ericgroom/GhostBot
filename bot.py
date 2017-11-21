@@ -55,7 +55,7 @@ async def test(message):
 
     await client.edit_message(tmp, 'You have {} messages.'.format(counter))
 
-@bot_command('!sleep')
+@bot_command('!sleep', active=False)
 async def sleep(message):
     await asyncio.sleep(5)
     await client.send_message(message.channel, 'Done sleeping')
@@ -93,6 +93,18 @@ async def roast(message):
     user = await api.get_user_from_battlenet(account)
     await client.edit_message(resp, f'{account} has suicided {user.suicides} times')
 
+@bot_command('!help')
+async def help(message):
+    await client.send_message(message.channel, 
+''' 
+Hello Guardian,
+Here are a few commands that you can use:
+`!help` display this message
+`!playtime [Battlenet]` display how long this battle.net account has logged in D2
+`!kda [Battlenet]` display user's pvp kda
+`!light [Battlenet]` display user's highest light level
+'''
+    )
 
 if __name__ == "__main__":
     client.run(keys['BOT_TOKEN'])
