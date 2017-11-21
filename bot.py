@@ -45,7 +45,7 @@ async def on_message(message):
         if command.active:
             await command.handler(message)
 
-@bot_command('!test')
+@bot_command('!test', active=False)
 async def test(message):
     counter = 0
     tmp = await client.send_message(message.channel, 'Calculating messages...')
@@ -60,7 +60,7 @@ async def sleep(message):
     await asyncio.sleep(5)
     await client.send_message(message.channel, 'Done sleeping')
 
-@bot_command('!time')
+@bot_command('!playtime')
 async def playtime(message):
     tokens = message.content.split()
     account = tokens[1]
