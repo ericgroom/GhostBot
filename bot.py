@@ -1,11 +1,16 @@
+import os
 import discord
 import aiohttp
 import asyncio
 import logging
 from collections import namedtuple
 
-import keys
 import destiny
+
+keys = {
+    'BUNGIE_KEY': os.environ['BUNGIE_KEY'],
+    'BOT_TOKEN': os.environ['BOT_TOKEN'],
+}
 
 from dev_utils import json_browser
 
@@ -14,7 +19,7 @@ Command = namedtuple('Command', ['handler', 'active'])
 logging.basicConfig(level=logging.INFO)
 client = discord.Client()
 session = aiohttp.ClientSession()
-api = destiny.API(keys.BUNGIE_KEY, session)
+api = destiny.API(keys['BUNGIE_KEY'], session)
 
 commands = {}
 
@@ -90,4 +95,4 @@ async def roast(message):
 
 
 if __name__ == "__main__":
-    client.run(keys.BOT_TOKEN)
+    client.run(keys['BOT_TOKEN'])
