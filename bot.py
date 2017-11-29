@@ -1,110 +1,102 @@
 import os
-import discord
+from discord.ext import commands
 import aiohttp
 import asyncio
 import logging
-from collections import namedtuple
 
 import destiny
+
+description = 'A bot for our Destiny 2 clan WGWD'
+
+if 'DEV' in os.environ and os.environ['DEV'].lower() == 'true':
+    from dev_utils import json_browser
+else:
+    def json_browser(*args): pass
 
 keys = {
     'BUNGIE_KEY': os.environ['BUNGIE_KEY'],
     'BOT_TOKEN': os.environ['BOT_TOKEN'],
 }
 
-from dev_utils import json_browser
-
-Command = namedtuple('Command', ['handler', 'active'])
-
 logging.basicConfig(level=logging.INFO)
-client = discord.Client()
+bot = commands.Bot(command_prefix='!', description=description)
 session = aiohttp.ClientSession()
 api = destiny.API(keys['BUNGIE_KEY'], session)
 
-commands = {}
-
-def bot_command(cmd_str, active=True):
-    def decorate(func):
-        commands[cmd_str] = Command(func, active)
-        return func
-    return decorate
-
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
 
-@client.event
-async def on_message(message):
-    print(message)
-    tokens = message.content.split()
-    if tokens[0] in commands.keys():
-        command = commands[tokens[0]]
-        if command.active:
-            await command.handler(message)
 
-@bot_command('!test', active=False)
-async def test(message):
+@bot.command(pass_context=True, enabled=False, hidden=True)
+async def test(ctx):
+    """
+    Counts the number of messages a user has sent in a channel
+    """
     counter = 0
-    tmp = await client.send_message(message.channel, 'Calculating messages...')
-    async for log in client.logs_from(message.channel, limit=100):
-        if log.author == message.author:
+    tmp = await bot.say('Calculating messages...')
+    async for log in bot.logs_from(ctx.message.channel, limit=100):
+        if log.author == ctx.message.author:
             counter += 1
 
-    await client.edit_message(tmp, 'You have {} messages.'.format(counter))
+    await bot.edit_message(tmp, f'You have {counter} messages.')
 
-@bot_command('!sleep', active=False)
-async def sleep(message):
+
+@bot.command(enabled=False, hidden=True)
+async def sleep():
+    """
+    Bots need naps too.
+    """
     await asyncio.sleep(5)
-    await client.send_message(message.channel, 'Done sleeping')
+    await bot.say('Done sleeping')
 
-@bot_command('!playtime')
-async def playtime(message):
-    tokens = message.content.split()
-    account = tokens[1]
-    resp = await client.send_message(message.channel, f'Getting time played for {account}...')
+
+@bot.command()
+async def playtime(account: str):
+    """
+    Shows how long a player has played D2 for across all characters.
+    :param account: Battle.net account including tag
+    """
+    await bot.type()
     user = await api.get_user_from_battlenet(account)
     json_browser(user.json)
-    await client.edit_message(resp, f'{account} has played for {user.time_played}')
+    await bot.say(f'{account} has played for {user.time_played}')
 
-@bot_command('!light')
-async def highest_light(message):
-    tokens = message.content.split()
-    account = tokens[1]
-    resp = await client.send_message(message.channel, f'Getting highest light for {account}...')
+
+@bot.command()
+async def light(account: str):
+    """
+    Shows a player's highest light on a character.
+    :param account: Battle.net account including tag
+    """
+    await bot.type()
     user = await api.get_user_from_battlenet(account)
-    await client.edit_message(resp, f'{account}\'s highest light character has {user.highest_light} light')
+    await bot.say(f'{account}\'s highest light character has {user.highest_light} light')
 
-@bot_command('!kda')
-async def kda(message):
-    tokens = message.content.split()
-    account = tokens[1]
-    resp = await client.send_message(message.channel, f'Getting {account}\'s kda...')
+@bot.command()
+async def kda(account: str):
+    """
+    Shows a player's KDA in the crucible.
+    :param account: Battle.net account including tag
+    """
+    await bot.type()
     user = await api.get_user_from_battlenet(account)
-    await client.edit_message(resp, f'{account}\'s PvP kda is {user.kda}')
+    await bot.say(f'{account}\'s PvP kda is {user.kda}')
 
-@bot_command('!roast')
-async def roast(message):
-    tokens = message.content.split()
-    account = tokens[1]
-    resp = await client.send_message(message.channel, f'Generating sick burn...')
+
+@bot.command(hidden=True)
+async def roast(account: str):
+    """
+    Shows how many times a user has committed suicide
+    :param account: Battle.net account including tag
+    """
+    await bot.type()
     user = await api.get_user_from_battlenet(account)
-    await client.edit_message(resp, f'{account} has suicided {user.suicides} times')
+    await bot.say(f'{account} has committed suicide {user.suicides} times')
 
-@bot_command('!help')
-async def help(message):
-    await client.send_message(message.channel, 
-''' 
-Hello Guardian,
-Here are a few commands that you can use:
-`!help` display this message
-`!playtime [Battlenet]` display how long this battle.net account has logged in D2
-`!kda [Battlenet]` display user's pvp kda
-`!light [Battlenet]` display user's highest light level
-'''
-    )
 
 if __name__ == "__main__":
-    client.run(keys['BOT_TOKEN'])
+    bot.run(keys['BOT_TOKEN'])
