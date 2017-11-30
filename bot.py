@@ -61,9 +61,13 @@ async def playtime(account: str):
     :param account: Battle.net account including tag
     """
     await bot.type()
-    user = await api.get_user_from_battlenet(account)
-    json_browser(user.json)
-    await bot.say(f'{account} has played for {user.time_played}')
+    try:
+        user = await api.get_user_from_battlenet(account)
+        json_browser(user.json)
+        await bot.say(f'{account} has played for {user.time_played}')
+    except destiny.UserNotFound:
+        await bot.say(user_not_found(account))
+
 
 
 @bot.command()
@@ -73,8 +77,12 @@ async def light(account: str):
     :param account: Battle.net account including tag
     """
     await bot.type()
-    user = await api.get_user_from_battlenet(account)
-    await bot.say(f'{account}\'s highest light character has {user.highest_light} light')
+    try:
+        user = await api.get_user_from_battlenet(account)
+        await bot.say(f'{account}\'s highest light character has {user.highest_light} light')
+    except destiny.UserNotFound:
+        await bot.say(user_not_found(account))
+
 
 @bot.command()
 async def kda(account: str):
@@ -83,8 +91,11 @@ async def kda(account: str):
     :param account: Battle.net account including tag
     """
     await bot.type()
-    user = await api.get_user_from_battlenet(account)
-    await bot.say(f'{account}\'s PvP kda is {user.kda}')
+    try:
+        user = await api.get_user_from_battlenet(account)
+        await bot.say(f'{account}\'s PvP kda is {user.kda}')
+    except destiny.UserNotFound:
+        await bot.say(user_not_found(account))
 
 
 @bot.command(hidden=True)
@@ -94,8 +105,16 @@ async def roast(account: str):
     :param account: Battle.net account including tag
     """
     await bot.type()
-    user = await api.get_user_from_battlenet(account)
-    await bot.say(f'{account} has committed suicide {user.suicides} times')
+    try:
+        user = await api.get_user_from_battlenet(account)
+        await bot.say(f'{account} has committed suicide {user.suicides} times')
+    except destiny.UserNotFound:
+        await bot.say(user_not_found(account))
+
+
+def user_not_found(account):
+    return f'User not found: "{account}". Please check that you have typed their Battle.net correctly'
+
 
 
 if __name__ == "__main__":
