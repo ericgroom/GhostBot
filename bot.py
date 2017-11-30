@@ -1,4 +1,5 @@
 import os
+# noinspection PyPackageRequirements
 from discord.ext import commands
 import aiohttp
 import asyncio
@@ -11,7 +12,8 @@ description = 'A bot for our Destiny 2 clan WGWD'
 if 'DEV' in os.environ and os.environ['DEV'].lower() == 'true':
     from dev_utils import json_browser
 else:
-    def json_browser(*args): pass
+    def json_browser(*args):
+        pass
 
 keys = {
     'BUNGIE_KEY': os.environ['BUNGIE_KEY'],
@@ -22,6 +24,7 @@ logging.basicConfig(level=logging.INFO)
 bot = commands.Bot(command_prefix='!', description=description)
 session = aiohttp.ClientSession()
 api = destiny.API(keys['BUNGIE_KEY'], session)
+
 
 @bot.event
 async def on_ready():
@@ -69,7 +72,6 @@ async def playtime(account: str):
         await bot.say(user_not_found(account))
 
 
-
 @bot.command()
 async def light(account: str):
     """
@@ -114,7 +116,6 @@ async def roast(account: str):
 
 def user_not_found(account):
     return f'User not found: "{account}". Please check that you have typed their Battle.net correctly'
-
 
 
 if __name__ == "__main__":

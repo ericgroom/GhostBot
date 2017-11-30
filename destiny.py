@@ -1,9 +1,11 @@
 import urllib
 
+
 class API:
-    '''
+    """
     class for interacting with the api
-    '''
+    """
+
     def __init__(self, token, session):
         self.token = token
         self.base_url = 'https://www.bungie.net/Platform/Destiny2/'
@@ -26,13 +28,16 @@ class API:
         json = await resp.json()
         return User(json['Response'])
 
+
 class User:
     def __init__(self, json):
         self.json = json
         self.time_played = json['mergedAllCharacters']['merged']['allTime']['secondsPlayed']['basic']['displayValue']
-        self.highest_light = json['mergedAllCharacters']['merged']['allTime']['highestLightLevel']['basic']['displayValue']
+        self.highest_light = json['mergedAllCharacters']['merged']['allTime']['highestLightLevel']['basic'][
+            'displayValue']
         self.kda = json['mergedAllCharacters']['results']['allPvP']['allTime']['efficiency']['basic']['displayValue']
         self.suicides = json['mergedAllCharacters']['merged']['allTime']['suicides']['basic']['displayValue']
+
 
 class UserNotFound(Exception):
     pass
