@@ -99,4 +99,8 @@ async def roast(account: str):
 
 
 if __name__ == "__main__":
-    bot.run(keys['BOT_TOKEN'])
+    try:
+        bot.run(keys['BOT_TOKEN'])
+    finally:
+        bot.close()
+        session.close()
